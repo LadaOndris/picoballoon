@@ -5,10 +5,10 @@ from models import State
 
 def read_new_data() -> List[State]:
     states = []
-    states.append(State(height=100))
-    states.append(State(height=540))
-    states.append(State(height=750))
-    states.append(State(height=250, longitude=12.452, latitude=54.124))
+    states.append(State(altitude=100))
+    states.append(State(altitude=540))
+    states.append(State(altitude=750))
+    states.append(State(altitude=250, longitude=12.452, latitude=54.124))
     states.append(State(latitude=41.8257, longitude=39.9468))
     states.append(State(latitude=47.0161, longitude=26.1547))
     states.append(State(latitude=47.3557, longitude=24.9239))

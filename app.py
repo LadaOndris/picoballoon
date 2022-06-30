@@ -21,23 +21,15 @@ init_db()
 @app.route('/')
 def index():
     logging.debug(f'Handling request: index.')
-    last_update = update_database()
     states = query_all_states()
-    last_update_string = format_last_update(last_update)
-    return render_template('index.html', lastUpdateDateTime=last_update_string, states=states)
+    return render_template('index.html', states=states)
 
 
 @app.route('/data')
 def data():
     logging.debug(f'Handling request: data.')
-    last_update = update_database()
     states = query_all_states()
-    last_update_string = format_last_update(last_update)
-    return render_template('data.html', lastUpdateDateTime=last_update_string, states=states)
-
-
-def format_last_update(last_update) -> str:
-    return last_update.strftime("%d/%m/%Y %H:%M:%S")
+    return render_template('data.html', states=states)
 
 
 @app.teardown_appcontext

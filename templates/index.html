@@ -95,8 +95,8 @@
 
         data.addRows([
             {% for state in states %}
-                {% if state.height is not none %}
-                    [new Date("{{ state.date_time }}"), {{ state.height }}],
+                {% if state.altitude is not none %}
+                    [new Date("{{ state.date_time }}"), {{ state.altitude }}],
                 {% endif %}
             {% endfor %}
         ]);
