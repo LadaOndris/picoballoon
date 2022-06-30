@@ -1,0 +1,11 @@
+{
+  "website": {
+  },
+  "client": {
+    "broker": "eu1.cloud.thethings.network",
+    "port": 1883,
+    "app_id": "testv3tg",
+    "device_id": "eui-70b3d57ed0050aa7",
+    "access_key": "NNSXS.UM2CNVLZH662W6JONDEEV5CDEB3RSUGPTEQUFJI.55KSB5VIOIBR3MKKAE34NYEUVH5KIIA5TNQGWBR7DTJ3MVRCCSFQ"
+  }
+}
