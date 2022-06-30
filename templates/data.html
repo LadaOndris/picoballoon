@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div>Last data update: {{ lastUpdateDateTime }}</div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Datetime</th>
+            <th scope="col">Height [m]</th>
+            <th scope="col">Latitude</th>
+            <th scope="col">Longitude</th>
+            <th scope="col">V battery [mV]</th>
+            <th scope="col">V capacitor [mV]</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for state in states %}
+            <tr>
+                <td>{{ state.date_time.strftime("%d/%m/%Y %H:%M:%S") }}</td>
+                <td>{{ state.height }}</td>
+                <td>{{ state.latitude }}</td>
+                <td>{{ state.longitude }}</td>
+                <td>{{ state.voltage_battery }}</td>
+                <td>{{ state.voltage_capacitor }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

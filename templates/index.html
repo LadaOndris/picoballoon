@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block head %}
+  {{ super() }}
+    <style>
+        #map {
+            height: 700px;
+            /* The height is 400 pixels */
+            width: 100%;
+            /* The width is the width of the web page */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="map"></div>
+    <div id="altitude_chart"></div>
+    <div id="voltage_chart"></div>
+
+<script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBb8Q1b77-dgTWUq6ISthdx6KCe48pL7sk&callback=initMap&v=weekly"
+        defer
+></script>
+<script>
+    function initMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 7,
+            center: {lat: {{ (states|lastposition).latitude }}, lng: {{ (states|lastposition).longitude }}},
+            mapTypeId: "terrain",
+        });
+        const flightPlanCoordinates = [
+            {% for state in states %}
+                {% if (state.latitude is not none) and (state.longitude is not none) %}
+                    {lat: {{ state.latitude }}, lng: {{ state.longitude }}},
+                {% endif %}
+            {% endfor %}
+        ];
+        const flightPath = new google.maps.Polyline({
+            path: flightPlanCoordinates,
+            geodesic: true,
+            strokeColor: "#2f2f77",
+            strokeOpacity: 1.0,
+            strokeWeight: 2,
+        });
+        {% for state in states %}
+            {% if (state.latitude is not none) and (state.longitude is not none) %}
+                new google.maps.Marker({
+                    icon: {
+                        path: "M512 256C512 397.4 397.4 512 256 512C114.6 512 0 397.4 0 256C0 114.6 114.6 0 256 0C397.4 0 512 114.6 512 256z",
+                        fillColor: "#0b0b33",
+                        fillOpacity: 1,
+                        strokeWeight: 0,
+                        strokeColor: "#ffffff",
+                        scale: 0.02,
+                        anchor: new google.maps.Point(5 * 50, 5 * 50)
+                    },
+                    map,
+                    position: {lat: {{ state.latitude }}, lng: {{ state.longitude }}}
+                });
+            {% endif %}
+        {% endfor %}
+        const lastPositionMarker = new google.maps.Marker({
+            icon: {
+                path: "M 8 9.984 C 10.191 9.653 12 7.48 12 5 a 4 4 0 0 0 -8 0 c 0 2.48 1.798 4.266 3.017 4.982 Z M 13 5 c 0 4 -4 6 -5 6 V 13 L 10 13 L 10 15 L 5 15 V 13 L 7 13 L 7 12 V 12 V 11 C 5 10 3 7.837 3 5 a 5 5 0 0 1 10 0 Z m -6.938 -0.495 a 2.003 2.003 0 0 1 1.443 -1.443 C 7.773 2.994 8 2.776 8 2.5 c 0 -0.276 -0.226 -0.504 -0.498 -0.459 a 3.003 3.003 0 0 0 -2.46 2.461 c -0.046 0.272 0.182 0.498 0.458 0.498 s 0.494 -0.227 0.562 -0.495 Z",
+                fillColor: "rgb(73,73,73)",
+                fillOpacity: 1,
+                strokeWeight: 2,
+                strokeColor: "#0b0b33",
+                scale: 2,
+                anchor: new google.maps.Point(7, 18)
+            },
+            map,
+            position: {lat: {{ (states|lastposition).latitude }}, lng: {{ (states|lastposition).longitude }}},
+        });
+
+        flightPath.setMap(map);
+    }
+
+    window.initMap = initMap;
+</script>
+
+<script>
+    google.charts.load('current', {packages: ['corechart', 'line']});
+    google.charts.setOnLoadCallback(drawLineColors);
+
+    function drawLineColors() {
+        drawAltitude();
+        drawVoltages();
+    }
+
+    function drawAltitude() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'X');
+        data.addColumn('number', 'Altitude');
+
+        data.addRows([
+            {% for state in states %}
+                {% if state.height is not none %}
+                    [new Date("{{ state.date_time }}"), {{ state.height }}],
+                {% endif %}
+            {% endfor %}
+        ]);
+
+        var options = {
+            title: 'Altitude',
+            height: 600,
+            hAxis: {
+                title: "Time",
+                format: 'MM/dd/yy hh:mm:ss'
+            },
+            vAxis: {
+                title: 'Altitude [m]',
+                minValue: 0
+            },
+            pointSize: 8,
+            chartArea: {
+                width: '90%'
+            },
+            legend: {position: 'none'}
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('altitude_chart'));
+        chart.draw(data, options);
+    }
+
+    function drawVoltages() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'X');
+        data.addColumn('number', 'Battery');
+        data.addColumn('number', 'Capacitor');
+
+        data.addRows([
+            {% for state in states %}
+                {% if state.voltage_battery is not none and state.voltage_capacitor is not none %}
+                    [new Date("{{ state.date_time }}"), {{ state.voltage_battery }}, {{ state.voltage_capacitor }}],
+                {% endif %}
+            {% endfor %}
+        ]);
+
+        var options = {
+            title: 'Voltages',
+            height: 600,
+            hAxis: {
+                title: "Time",
+                format: 'MM/dd/yy hh:mm:ss'
+            },
+            vAxis: {
+                title: 'Voltage [mV]',
+                minValue: 0
+            },
+            pointSize: 8,
+            chartArea: {
+                width: '90%'
+            },
+            legend: {position: 'top'}
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('voltage_chart'));
+        chart.draw(data, options);
+    }
+</script>
+
+{% endblock %}
