@@ -2,7 +2,7 @@ import json
 import logging
 from struct import pack, unpack
 from typing import Tuple
-
+import math
 import numpy as np
 import paho.mqtt.client as mqtt
 
@@ -101,8 +101,12 @@ def compute_weights_from_dbms(dbms: np.ndarray) -> np.ndarray:
     return weights
 
 
-def pressure_to_altitude(pressure: int) -> int:
-    return 0
+def pressure_to_altitude(pressure_kPa: float) -> int:
+    """
+    Converts pressure in kPa (kilopascal) to altitude in meters.
+    """
+    altitude = math.log(pressure_kPa / 101.325) / -0.00012
+    return int(altitude)
 
 
 def on_message(mqttc, obj, msg):
@@ -115,7 +119,10 @@ def on_message(mqttc, obj, msg):
 
     payload: Payload = read_payload(decoded_payload)
     position = triangulate_position(gateways_info)
-    altitude = pressure_to_altitude(payload.pressure)
+    if payload.pressure is None:
+        altitude = None
+    else:
+        altitude = pressure_to_altitude(payload.pressure)
     save_to_db(payload, position, altitude)
 
 
