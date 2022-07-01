@@ -15,6 +15,8 @@
 {% block content %}
     <div id="map"></div>
     <div id="altitude_chart"></div>
+    <div id="temperature_chart"></div>
+    <div id="pressure_chart"></div>
     <div id="voltage_chart"></div>
 
 <script
@@ -86,6 +88,8 @@
     function drawLineColors() {
         drawAltitude();
         drawVoltages();
+        drawTemperature();
+        drawPressure();
     }
 
     function drawAltitude() {
@@ -103,7 +107,7 @@
 
         var options = {
             title: 'Altitude',
-            height: 600,
+            height: 500,
             hAxis: {
                 title: "Time",
                 format: 'MM/dd/yy hh:mm:ss'
@@ -114,12 +118,83 @@
             },
             pointSize: 8,
             chartArea: {
-                width: '90%'
+                width: '85%'
             },
             legend: {position: 'none'}
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('altitude_chart'));
+        chart.draw(data, options);
+    }
+
+
+    function drawTemperature() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'X');
+        data.addColumn('number', 'Temperature');
+
+        data.addRows([
+            {% for state in states %}
+                {% if state.temperature is not none %}
+                    [new Date("{{ state.date_time }}"), {{ state.temperature }}],
+                {% endif %}
+            {% endfor %}
+        ]);
+
+        var options = {
+            title: 'Temperature',
+            height: 500,
+            hAxis: {
+                title: "Time",
+                format: 'MM/dd/yy hh:mm:ss'
+            },
+            vAxis: {
+                title: 'Temperature [°C]',
+                minValue: 0
+            },
+            pointSize: 8,
+            chartArea: {
+                width: '85%'
+            },
+            legend: {position: 'none'}
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('temperature_chart'));
+        chart.draw(data, options);
+    }
+
+    function drawPressure() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'X');
+        data.addColumn('number', 'Pressure');
+
+        data.addRows([
+            {% for state in states %}
+                {% if state.pressure is not none %}
+                    [new Date("{{ state.date_time }}"), {{ state.pressure }}],
+                {% endif %}
+            {% endfor %}
+        ]);
+
+        var options = {
+            title: 'Pressure',
+            height: 500,
+            hAxis: {
+                title: "Time",
+                format: 'MM/dd/yy hh:mm:ss'
+            },
+            vAxis: {
+                title: 'Pressure',
+                minValue: 0
+            },
+            pointSize: 8,
+            chartArea: {
+                width: '85%'
+            },
+            legend: {position: 'none'}
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('pressure_chart'));
         chart.draw(data, options);
     }
 
@@ -139,7 +214,7 @@
 
         var options = {
             title: 'Voltages',
-            height: 600,
+            height: 500,
             hAxis: {
                 title: "Time",
                 format: 'MM/dd/yy hh:mm:ss'
@@ -150,7 +225,7 @@
             },
             pointSize: 8,
             chartArea: {
-                width: '90%'
+                width: '85%'
             },
             legend: {position: 'top'}
         };
