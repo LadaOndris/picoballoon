@@ -122,7 +122,8 @@ def on_message(mqttc, obj, msg):
     if payload.pressure is None:
         altitude = None
     else:
-        altitude = pressure_to_altitude(payload.pressure)
+        pressure_kPa = payload.pressure / 1000
+        altitude = pressure_to_altitude(pressure_kPa)
     save_to_db(payload, position, altitude)
 
 
