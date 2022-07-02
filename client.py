@@ -110,7 +110,9 @@ def pressure_to_altitude(pressure_kPa: float) -> int:
 
 
 def on_message(mqttc, obj, msg):
-    logging.info("Received message. Decoding content...")
+    logging.info("Received message:")
+    logging.info(msg.payload)
+    logging.info("Decoding content...")
 
     x = json.loads(msg.payload.decode('utf-8'))
     uplink_message = x['uplink_message']
